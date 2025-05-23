@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
-use App\Mail\SendUserEmail;
+use App\Mail\sendUserEmail;
 use Illuminate\Http\Request;
 use App\Jobs\SendCampaignEmails;
 use App\Imports\RecipientsImport;
