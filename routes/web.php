@@ -32,7 +32,8 @@ Route::middleware('guest')->group(function () {
 
 
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 
 // Authenticated Routes
 Route::middleware(['auth'])->group(function () {
@@ -141,8 +142,7 @@ Route::prefix('admin')->group(function () {
     // Protecting admin routes using the 'admin' middleware
     Route::middleware(['admin'])->group(function () {
         // Admin logout route
-        Route::post('/logout', [App\Http\Controllers\Admin\AdminController::class, 'logout'])
-            ->name('logout'); // Admin Profile Routes
+
         Route::get('/profile', [App\Http\Controllers\Admin\AdminController::class, 'editProfile'])->name('admin.profile');
         Route::post('/profile/update', [App\Http\Controllers\Admin\AdminController::class, 'updateProfile'])->name('admin.profile.update');
         Route::post('/profile/password', [App\Http\Controllers\Admin\AdminController::class, 'updatePassword'])->name('admin.profile.password.update');
