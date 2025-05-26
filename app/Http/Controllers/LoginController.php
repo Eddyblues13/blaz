@@ -16,12 +16,12 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
             $request->session()->regenerate();
 
             return response()->json([
@@ -30,11 +30,10 @@ class LoginController extends Controller
             ]);
         }
 
-        return response()->json([
-            'errors' => [
-                'email' => ['These credentials do not match our records.']
-            ]
-        ], 422);
+        throw ValidationException::withMessages([
+            'email' => [trans('auth.failed')],
+            'password' => [trans('auth.failed')]
+        ]);
     }
 
     public function logout(Request $request)
