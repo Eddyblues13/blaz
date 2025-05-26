@@ -11,7 +11,6 @@
         :root {
             --primary-color: #4f46e5;
             --error-color: #dc3545;
-            --success-color: #28a745;
             --text-color: #333;
             --light-gray: #f3f4f6;
             --border-color: #d1d5db;
@@ -28,9 +27,6 @@
             background-color: #f9fafb;
             color: var(--text-color);
             line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         header {
@@ -60,7 +56,6 @@
             background-color: white;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            flex-grow: 1;
         }
 
         .login-container h2 {
@@ -146,14 +141,6 @@
             height: 1rem;
         }
 
-        .success-message {
-            color: var(--success-color);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
         .spinner-border {
             display: inline-block;
             width: 1rem;
@@ -181,14 +168,6 @@
             padding: 1.5rem;
             color: #6b7280;
             font-size: 0.875rem;
-            margin-top: auto;
-        }
-
-        .forgot-password {
-            display: block;
-            text-align: right;
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -203,20 +182,7 @@
 
     <div class="login-container">
         <h2>Login to your account</h2>
-
-        @if (session('status'))
-        <div class="success-message">
-            {{ session('status') }}
-        </div>
-        @endif
-
-        @if (session('registered'))
-        <div class="success-message">
-            Registration successful! Please login with your credentials.
-        </div>
-        @endif
-
-        <form id="loginForm" method="POST" action="{{ route('login.submit') }}">
+        <form id="loginForm" method="POST">
             @csrf
 
             <div class="form-group">
@@ -229,13 +195,6 @@
                 <label for="id_password">Password:</label>
                 <input type="password" name="password" autocomplete="current-password" required id="id_password">
                 <div class="error-message" id="password_error"></div>
-                <a href="" class="forgot-password">Forgot password?</a>
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="remember"> Remember Me
-                </label>
             </div>
 
             <button type="submit" class="btn" id="submitBtn">
@@ -266,26 +225,13 @@
                 $('.error-message').text('');
                 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: "{{ route('login.submit') }}",
                     method: 'POST',
                     data: $(this).serialize(),
                     dataType: 'json',
                     success: function(response) {
                         if(response.success) {
                             window.location.href = response.redirect;
-                        } else {
-                            // Handle cases where success is false but status is 200
-                            $('#submitBtn').prop('disabled', false);
-                            $('#btnText').text('Login');
-                            $('#spinner').addClass('hidden');
-                            
-                            if(response.errors) {
-                                $.each(response.errors, function(key, value) {
-                                    $('#' + key + '_error').text(value[0]);
-                                });
-                            } else {
-                                $('#password_error').text(response.message || 'Login failed. Please try again.');
-                            }
                         }
                     },
                     error: function(xhr) {
@@ -298,22 +244,13 @@
                             $.each(errors, function(key, value) {
                                 $('#' + key + '_error').text(value[0]);
                             });
-                        } else if(xhr.status === 429) {
-                            $('#password_error').text('Too many login attempts. Please try again later.');
+                        } else if(xhr.status === 401) {
+                            $('#password_error').text('Invalid credentials');
                         } else {
-                            var errorMsg = xhr.responseJSON && xhr.responseJSON.message 
-                                ? xhr.responseJSON.message 
-                                : 'An unexpected error occurred. Please try again.';
-                            $('#password_error').text(errorMsg);
+                            alert('An error occurred. Please try again.');
                         }
                     }
                 });
-            });
-            
-            // Clear error when user starts typing
-            $('input').on('input', function() {
-                const fieldName = $(this).attr('name');
-                $(`#${fieldName}_error`).text('');
             });
         });
     </script>

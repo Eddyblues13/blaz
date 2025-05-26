@@ -129,10 +129,6 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-// Route::get('/', [AdminLoginController::class, 'adminLoginForm'])->name('admin.login');
-Route::get('admin/login', [AdminLoginController::class, 'adminLoginForm'])->name('admin.login');
-Route::post('admin/login', [AdminLoginController::class, 'login'])->name('login.submit');
-
 
 
 
