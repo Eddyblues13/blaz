@@ -182,7 +182,7 @@
 
     <div class="login-container">
         <h2>Login to your account</h2>
-        <form id="loginForm" method="POST">
+        <form id="loginForm" method="POST" action="{{ route('login.submit') }}">
             @csrf
 
             <div class="form-group">
@@ -195,6 +195,12 @@
                 <label for="id_password">Password:</label>
                 <input type="password" name="password" autocomplete="current-password" required id="id_password">
                 <div class="error-message" id="password_error"></div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="remember"> Remember Me
+                </label>
             </div>
 
             <button type="submit" class="btn" id="submitBtn">
@@ -225,7 +231,7 @@
                 $('.error-message').text('');
                 
                 $.ajax({
-                    url: "{{ route('login.submit') }}",
+                    url: $(this).attr('action'),
                     method: 'POST',
                     data: $(this).serialize(),
                     dataType: 'json',
@@ -244,10 +250,8 @@
                             $.each(errors, function(key, value) {
                                 $('#' + key + '_error').text(value[0]);
                             });
-                        } else if(xhr.status === 401) {
-                            $('#password_error').text('Invalid credentials');
                         } else {
-                            alert('An error occurred. Please try again.');
+                            $('#password_error').text('Invalid credentials. Please try again.');
                         }
                     }
                 });

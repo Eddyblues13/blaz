@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -16,25 +17,47 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Check if email exists first
+            if (!Auth::validate(['email' => $request->email, 'password' => $request->password])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials',
+                    'errors' => [
+                        'email' => ['The provided credentials are incorrect.']
+                    ]
+                ], 422);
+            }
+
+            // If we get here, credentials are valid
+            Auth::attempt($request->only('email', 'password'), $request->remember);
             $request->session()->regenerate();
 
             return response()->json([
                 'success' => true,
-                'redirect' => route('dashboard') // Change to your intended route
+                'message' => 'Login successful!',
+                'redirect' => route('dashboard')
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during login. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'errors' => [
-                'email' => ['These credentials do not match our records.']
-            ]
-        ], 422);
     }
 
     public function logout(Request $request)
