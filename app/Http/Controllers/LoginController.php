@@ -18,7 +18,6 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         try {
-            // Validate the request data
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'password' => 'required',
@@ -32,25 +31,26 @@ class LoginController extends Controller
                 ], 422);
             }
 
-            // Attempt to authenticate the user
-            if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
-                $request->session()->regenerate();
-
+            // Check if email exists first
+            if (!Auth::validate(['email' => $request->email, 'password' => $request->password])) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Login successful!',
-                    'redirect' => route('dashboard')
-                ]);
+                    'success' => false,
+                    'message' => 'Invalid credentials',
+                    'errors' => [
+                        'email' => ['The provided credentials are incorrect.']
+                    ]
+                ], 422);
             }
 
-            // If authentication fails
+            // If we get here, credentials are valid
+            Auth::attempt($request->only('email', 'password'), $request->remember);
+            $request->session()->regenerate();
+
             return response()->json([
-                'success' => false,
-                'message' => 'The given data was invalid.',
-                'errors' => [
-                    'email' => [trans('auth.failed')]
-                ]
-            ], 422);
+                'success' => true,
+                'message' => 'Login successful!',
+                'redirect' => route('dashboard')
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
