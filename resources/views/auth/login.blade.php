@@ -229,7 +229,7 @@
                 <label for="id_password">Password:</label>
                 <input type="password" name="password" autocomplete="current-password" required id="id_password">
                 <div class="error-message" id="password_error"></div>
-                <a href="{{ route('password.request') }}" class="forgot-password">Forgot password?</a>
+                <a href="" class="forgot-password">Forgot password?</a>
             </div>
 
             <div class="form-group">
