@@ -24,11 +24,6 @@
 
         <p>If this wasn’t you, please secure your account immediately.</p>
 
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="https://c.comteb.online/app/index.html"
-                style="background-color: #0066cc; color: #ffffff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 14px;"
-                target="_blank" rel="noopener noreferrer">Secure My Account</a>
-        </div>
 
         <p style="font-size: 13px; color: #555555; margin-top: 30px;">
             Note: This is a precautionary measure to protect your account.
